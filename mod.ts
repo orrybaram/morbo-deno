@@ -62,18 +62,18 @@ async function main() {
   }
 
   // Read options from .morborc
-  try {
-    const decoder = new TextDecoder('utf-8');
-    const data = await Deno.readFile('.morborc');
-    const config = decoder.decode(data);
-    options = { ...JSON.parse(config) };
-  } catch (err) {
-    if (err.message.match(/No such file or directory/)) {
-      console.warn('No .morborc file, using default settings');
-    } else {
-      console.log(err);
-    }
-  }
+  // try {
+  //   const decoder = new TextDecoder('utf-8');
+  //   const data = await Deno.readFile('.morborc');
+  //   const config = decoder.decode(data);
+  //   options = { ...JSON.parse(config) };
+  // } catch (err) {
+  //   if (err.message.match(/No such file or directory/)) {
+  //     console.warn('No .morborc file, using default settings');
+  //   } else {
+  //     console.log(err);
+  //   }
+  // }
 
   const skipPatterns = args.skip || args.s;
 
