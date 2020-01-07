@@ -1,5 +1,5 @@
-import removeCommentEnd from './removeCommentEnd.ts';
-import { Definitions } from './defaultDefinitions.ts';
+import removeCommentEnd from './removeCommentEnd';
+import { Definitions } from './defaultDefinitions';
 
 
 /**
