@@ -22,9 +22,6 @@ const getGitBlame = async ({
   fileName: string;
   lineNumber: number;
 }) => {
-
-  console.log(fileName, root, lineNumber)
-
   const process = Deno.run({
     args: [
       'git',
@@ -36,39 +33,38 @@ const getGitBlame = async ({
       `${lineNumber}, ${lineNumber}`,
       '-p',
     ],
+    stdout: 'piped',
   });
 
+  await process.status()
 
-  const result = await process.status()
-  console.log(JSON.stringify(result, null, 2))
+  const decoder = new TextDecoder('utf-8');
 
-  // return code;
-  // const blame = blameSpawn.stdout.toString();
+  const blame = decoder.decode(await process.output());
 
-  // // Hack: this parses the blame, hopefully will stay reliable
-  // const splitBlame = blame.split('\n');
-  // let commitData = {};
 
-  // if (splitBlame.length > 1) {
-  //   const hash = splitBlame[0].split(' ')[0];
-  //   const authorName = splitBlame[1].replace('author ', '');
-  //   const authorEmail = splitBlame[2].replace('author-mail ', '');
-  //   const timestamp = splitBlame[3].replace('author-time ', '');
-  //   const summary = splitBlame[9].replace('summary ', '');
+  // Hack: this parses the blame, hopefully will stay reliable
+  const splitBlame = blame.split('\n');
+  let commitData = {};
 
-  //   commitData = {
-  //     hash,
-  //     authorName,
-  //     authorEmail,
-  //     timestamp,
-  //     summary,
-  //   };
-  // }
+  if (splitBlame.length > 1) {
+    const hash = splitBlame[0].split(' ')[0];
+    const authorName = splitBlame[1].replace('author ', '');
+    const authorEmail = splitBlame[2].replace('author-mail ', '');
+    const timestamp = splitBlame[3].replace('author-time ', '');
+    const summary = splitBlame[9].replace('summary ', '');
 
-  // return {
-  //   ...result,
-  //   commitData,
-  // };
+    commitData = {
+      hash,
+      authorName,
+      authorEmail,
+      timestamp,
+      summary,
+    };
+  }
+
+  return commitData;
+
 };
 
 export default getGitBlame;

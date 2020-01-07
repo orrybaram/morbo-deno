@@ -21,8 +21,8 @@ export default async function morbo(options: Options) {
       const lineNumber = idx + 1;
       const message = getMessagesFromLine(defaultDefinitions, line, lineNumber, filename)
       if (message.length) {
-        const blame = await getGitBlame({ root: options.rootDir, lineNumber, fileName: filename})
-        messages.push({ ...message});
+        const gitBlame = await getGitBlame({ root: options.rootDir, lineNumber, fileName: filename})
+        messages.push({ ...message, gitBlame});
       }
     })
   }
