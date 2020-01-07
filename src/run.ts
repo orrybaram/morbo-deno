@@ -4,6 +4,9 @@ import { Options } from '../mod.ts';
 import getMessagesFromLine from '../legacy/lib/getMessagesFromLine.ts';
 import defaultDefinitions from './defaultDefinitions.ts';
 import getGitBlame from './getGitBlame.ts';
+import parallel from './limiter.ts';
+
+
 
 export default async function morbo(options: Options) {
   const regExSkips = options.skip.map((glob) => globToRegExp(glob));
@@ -21,12 +24,18 @@ export default async function morbo(options: Options) {
       const lineNumber = idx + 1;
       const message = getMessagesFromLine(defaultDefinitions, line, lineNumber, filename)
       if (message.length) {
-        const gitBlame = await getGitBlame({ root: options.rootDir, lineNumber, fileName: filename})
-        messages.push({ ...message, gitBlame});
+        messages.push({ ...message });
       }
     })
   }
 
-  console.log(JSON.stringify(messages, null, 2));
+  const blames = messages.map((message) => {
+      return getGitBlame({ root: options.rootDir, lineNumber: message[0].lineNumber, fileName: message[0].fileName})
+  })
+
+  const result = await parallel(blames, 10)
+  console.log(result)
+
+  // console.log(JSON.stringify(messages, null, 2));
   return messages;
 }
