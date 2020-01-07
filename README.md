@@ -6,5 +6,3 @@
 ```sh
 deno run https://raw.githubusercontent.com/orrybaram/morbo-deno/master/mod.ts
 ```
-
-
