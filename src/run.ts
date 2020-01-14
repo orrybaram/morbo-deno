@@ -1,9 +1,7 @@
 import { walk, readFileStr } from 'https://deno.land/std/fs/mod.ts';
 
 export default async function run() {
-  for await (const { filename, info } of walk(Deno.cwd(), {
-    skip: [/^.*\/\.git$/],
-  })) {
+  for await (const { filename, info } of walk(Deno.cwd())) {
     if (info.isDirectory() || !info.isFile()) {
       continue;
     }
@@ -11,12 +9,14 @@ export default async function run() {
     const file = await readFileStr(filename);
     const lines = file.split('\n');
 
-    lines.forEach(async (line, idx) => {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
       if (!line) {
-        return;
+        continue;
       }
 
-      const lineNumber = idx + 1;
+      const lineNumber = i + 1;
 
       const process = Deno.run({
         args: [
@@ -36,8 +36,9 @@ export default async function run() {
 
       const decoder = new TextDecoder('utf-8');
       const result = await process.output();
+      process.close();
 
       console.log(decoder.decode(result));
-    });
+    }
   }
 }
