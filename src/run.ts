@@ -1,38 +1,52 @@
 import { walk, readFileStr, globToRegExp } from '../deps.ts';
 import { Options } from '../mod.ts';
-import getMessagesFromLine from './getMessagesFromLine.ts';
+import getMessagesFromLine, { Message } from './getMessagesFromLine.ts';
 import defaultDefinitions from './defaultDefinitions.ts';
 import getGitBlame from './getGitBlame.ts';
-import parallel from './limiter.ts';
 
 export default async function morbo(options: Options) {
-  const regExSkips = options.skip.map((glob) => globToRegExp(glob));
-  let messages = [];
+  const regExSkips = options.skip.map(glob => globToRegExp(glob));
+  let messages: Message[] = [];
 
-  for await (const {filename, info} of walk(options.rootDir, {skip: regExSkips})) {
-    if (info.isDirectory()) {
+  for await (const { filename, info } of walk(options.rootDir, {
+    skip: regExSkips,
+  })) {
+    if (info.isDirectory() || !info.isFile()) {
       continue;
-    };
-
-    const file  = await readFileStr(filename)
+    }
+    const file = await readFileStr(filename);
     const lines = file.split('\n');
 
-    lines.forEach(async (line, idx) => {
-      const lineNumber = idx + 1;
-      const newMessages = getMessagesFromLine(defaultDefinitions, line, lineNumber, filename)
-      if (newMessages.length) {
-        messages = [...messages, ...newMessages]
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineNumber = i + 1;
+
+      if (!line) {
+        continue;
       }
-    })
+      const newMessages = getMessagesFromLine(
+        defaultDefinitions,
+        line,
+        lineNumber,
+        filename,
+      );
+      if (newMessages.length) {
+        messages = [...messages, ...newMessages];
+      }
+    }
   }
 
-  const blames = messages.map((message) => {
-      return getGitBlame({ root: options.rootDir, lineNumber: message.lineNumber, fileName: message.fileName})
-  })
+  for (let i = 0; i < messages.length; i++) {
+    const message = messages[i];
 
-  const result = await parallel(blames, 10)
-  console.log(result)
+    const blame = await getGitBlame({
+      root: options.rootDir,
+      lineNumber: message.lineNumber,
+      fileName: message.fileName,
+    });
 
-  // console.log(JSON.stringify(messages, null, 2));
+    message.blame = blame;
+  }
+
   return messages;
 }

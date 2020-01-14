@@ -1,5 +1,6 @@
 import removeCommentEnd from './removeCommentEnd.ts';
 import { Definitions } from './defaultDefinitions.ts';
+import { GitBlame } from './getGitBlame.ts';
 
 
 /**
@@ -17,13 +18,14 @@ import { Definitions } from './defaultDefinitions.ts';
  * @return  {Array}
  */
 
-type Message = {
+export type Message = {
   author: string | null;
   message: string | null;
   label: string | null;
   lineNumber: number;
   fileName: string;
   description?: string | null;
+  blame?: GitBlame;
 };
 
 export default function getMessagesFromLine(
