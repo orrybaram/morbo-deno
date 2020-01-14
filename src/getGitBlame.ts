@@ -1,16 +1,9 @@
-type Results = {
-  author: string | null;
-  description?: string;
-  fileName: string;
-  label: string;
-  lineNumber: number;
-  message: string;
-}[];
-
-type GitBlameDataType = 'line' | 'commit';
-type GitBlameDataResult = {
-  finalLine: number;
+export type GitBlame = {
   hash: string;
+  authorName: string;
+  authorEmail: string;
+  timestamp: string;
+  summary: string;
 };
 
 const getGitBlame = async ({
@@ -26,7 +19,7 @@ const getGitBlame = async ({
     args: [
       'git',
       '-C',
-      root,
+      Deno.cwd(),
       'blame',
       fileName,
       '-L',
@@ -36,16 +29,17 @@ const getGitBlame = async ({
     stdout: 'piped',
   });
 
-  await process.status()
+  await process.status();
 
   const decoder = new TextDecoder('utf-8');
+  const result = await process.output();
+  process.close();
 
-  const blame = decoder.decode(await process.output());
-
+  const blame = decoder.decode(result);
 
   // Hack: this parses the blame, hopefully will stay reliable
   const splitBlame = blame.split('\n');
-  let commitData = {};
+  let commitData = {} as GitBlame;
 
   if (splitBlame.length > 1) {
     const hash = splitBlame[0].split(' ')[0];
@@ -64,7 +58,6 @@ const getGitBlame = async ({
   }
 
   return commitData;
-
 };
 
 export default getGitBlame;

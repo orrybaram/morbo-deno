@@ -118,9 +118,9 @@ window.run = payload => {
     techDebt[type].messages.forEach(message => {
       const $message = document.createElement('div');
 
-      const author = message.commitData && message.commitData.author.name;
+      const author = message.blame && message.blame.authorName;
 
-      const commitHash = message.commitData && message.commitData.hash;
+      const commitHash = message.blame && message.blame.hash;
 
       const getFileOutput = () => {
         const repoType = getRepoType(payload.repositoryUrl);
@@ -135,9 +135,7 @@ window.run = payload => {
         }
 
         if (href) {
-          return `<a target="_blank" href="${href}">${message.fileName}:${
-            message.lineNumber
-          }</a>`;
+          return `<a target="_blank" href="${href}">${message.fileName}:${message.lineNumber}</a>`;
         }
 
         return `${message.fileName}:${message.lineNumber}`;

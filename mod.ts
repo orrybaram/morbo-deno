@@ -1,6 +1,7 @@
 import { parse } from 'https://deno.land/std/flags/mod.ts';
 
 import run from './src/run.ts';
+import generateReport from './src/generateReport.ts';
 
 export type Options = {
   customDefinitions?: { [key: string]: any };
@@ -62,18 +63,18 @@ async function main() {
   }
 
   // Read options from .morborc
-  // try {
-  //   const decoder = new TextDecoder('utf-8');
-  //   const data = await Deno.readFile('.morborc');
-  //   const config = decoder.decode(data);
-  //   options = { ...JSON.parse(config) };
-  // } catch (err) {
-  //   if (err.message.match(/No such file or directory/)) {
-  //     console.warn('No .morborc file, using default settings');
-  //   } else {
-  //     console.log(err);
-  //   }
-  // }
+  try {
+    const decoder = new TextDecoder('utf-8');
+    const data = await Deno.readFile('.morborc');
+    const config = decoder.decode(data);
+    options = { ...JSON.parse(config) };
+  } catch (err) {
+    if (err.message.match(/No such file or directory/)) {
+      console.warn('No .morborc file, using default settings');
+    } else {
+      console.log(err);
+    }
+  }
 
   const skipPatterns = args.skip || args.s;
 
@@ -86,12 +87,22 @@ async function main() {
     }
   }
 
+  /* TODO: skip files that are in the projects gitignore
+    1. read gitignore file
+    2. grab each line
+    3. add to skip
+  */
+
   const rootDir = args._;
   if (rootDir.length > 0) {
     options.rootDir = rootDir.join(',');
   }
 
-  run(options);
+  const messages = await run(options);
+
+  // TODO: get git repo url
+
+  generateReport(messages, options.rootDir);
 }
 
 main();
