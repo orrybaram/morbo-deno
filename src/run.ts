@@ -1,13 +1,13 @@
 import { walk, readFileStr } from 'https://deno.land/std/fs/mod.ts';
 import { globToRegExp } from 'https://deno.land/std/path/mod.ts';
 import { Options } from '../mod.ts';
-import getMessagesFromLine from './getMessagesFromLine.ts';
+import getMessagesFromLine, { Message } from './getMessagesFromLine.ts';
 import defaultDefinitions from './defaultDefinitions.ts';
 import getGitBlame from './getGitBlame.ts';
 
 export default async function morbo(options: Options) {
   const regExSkips = options.skip.map(glob => globToRegExp(glob));
-  let messages = [];
+  let messages: Message[] = [];
 
   for await (const { filename, info } of walk(options.rootDir, {
     skip: regExSkips,

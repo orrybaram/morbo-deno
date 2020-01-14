@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <title>Morbo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="content">
+      <header>
+        <div class="flex">
+          <div class="flex">
+            <img src="assets/morbo.png" class="logo" />
+            <p>Morbo is <span id="morbosTemperment"></span></p>
+          </div>
+          <h1 class="header__h1">
+            <span id="techDebtCount"></span> infractions in <span id="fileCount"></span> files.
+          </h1>
+        </div>
+      </header>
+      <main class="box">
+        <h2 id="resultsHeader"></h2>
+        <div id="results"></div>
+        <div id="success" style="display: none;">
+          <img src="" id="catGif" />
+        </div>
+      </main>
+  </div>
+
+    <script src="debt-collection.js"></script>
+    <script src="client.js"></script>
+    <script>
+      run(techDebt);
+    </script>
+  </body>
+</html>
