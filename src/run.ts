@@ -1,5 +1,4 @@
-import { walk, readFileStr } from 'https://deno.land/std/fs/mod.ts';
-import { globToRegExp } from  'https://deno.land/std/path/mod.ts';
+import { walk, readFileStr, globToRegExp } from '../deps.ts';
 import { Options } from '../mod.ts';
 import getMessagesFromLine from './getMessagesFromLine.ts';
 import defaultDefinitions from './defaultDefinitions.ts';

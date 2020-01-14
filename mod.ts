@@ -1,4 +1,4 @@
-import { parse } from 'https://deno.land/std/flags/mod.ts';
+import { parseFlag } from './deps.ts';
 
 import run from './src/run.ts';
 
@@ -53,7 +53,7 @@ ${JSON.stringify(defaultOptions, null, 2)}
 }
 
 async function main() {
-  const args = parse(Deno.args.slice(1));
+  const args = parseFlag(Deno.args.slice(1));
   let options: Options = defaultOptions;
 
   if (args.help || args.h) {
