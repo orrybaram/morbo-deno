@@ -91,7 +91,9 @@ async function main() {
     options.rootDir = rootDir.join(',');
   }
 
-  run(options);
+  const messages = await run(options);
+
+  console.log(JSON.stringify(messages, null, 2));
 }
 
 main();
